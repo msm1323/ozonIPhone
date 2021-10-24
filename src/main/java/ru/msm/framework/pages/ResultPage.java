@@ -224,7 +224,6 @@ public class ResultPage extends BasePage {
                     bS = preClickButtonsNum;
                     DRIVER_MANAGER.getDriver().get(DRIVER_MANAGER.getDriver().getCurrentUrl());
                 }
-//                DRIVER_MANAGER.getDriver().get(DRIVER_MANAGER.getDriver().getCurrentUrl());
                 wait.until(buttonsSizeToBe(buttons, bS));
             } catch (TimeoutException ex) {    //не дождались смены кол-ва товаров - надо проверить, прошел ли click
                 System.out.println(ex.getMessage());

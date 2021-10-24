@@ -19,32 +19,23 @@ public class Hooks {
 
     @Attachment(value = "ProductsInfo", type = "text/plain", fileExtension = "txt")
     public byte[] getProductsInfo() {
-//        StringBuilder info = new StringBuilder();
-//        Assertions.assertNotNull(DATA_MANAGER);
-//        for (int i = 0; i < DATA_MANAGER.getProductsNum(); i++) {
-//            info.append(DATA_MANAGER.getProductName(i))
-//                    .append("\n")
-//                    .append(DATA_MANAGER.getProductPrice(i))
-//                    .append("\n\n");
-//        }
-//        info.append(DATA_MANAGER.getInfoMostExpensiveProduct());
-//        return info.toString().getBytes();
         return DATA_MANAGER.getProductsInfo().getBytes();
     }
 
     @Before
     public void before(){
-        System.out.println("hook before");
         InitManager.initFramework();
     }
 
-    @After
-    public void after(){
-        System.out.println("Hook after");
+    @After(order = 500)
+    public void createProductsInfo(){
         step("Список всех товаров и товар с наибольшей ценой.", () -> {
-            System.out.println("step addAttachment");
             Allure.getLifecycle().addAttachment("ProductsInfo", "text/plain", "txt", getProductsInfo());
         });
+    }
+
+    @After(order = 100)
+    public void after(){
         InitManager.quitFramework();
     }
 

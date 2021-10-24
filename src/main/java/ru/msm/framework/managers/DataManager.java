@@ -13,38 +13,24 @@ public class DataManager {
     private ArrayList<Product> products;
 
     private DataManager() {
-        System.out.println("products = new ArrayList<>()");
         products = new ArrayList<>();
     }
 
     public static DataManager getINSTANCE() {
         if (DATA_MANAGER == null) {
-            System.out.println("DATA_MANAGER = new DataManager();");
             DATA_MANAGER = new DataManager();
-//            System.out.println("products = new ArrayList<>()");
-//            products = new ArrayList<>();
         }
         return DATA_MANAGER;
     }
 
     public void addProduct(String name, int price) {
-//        if (products == null) {
-//            System.out.println("products = new ArrayList<>()");
-//            products = new ArrayList<>();
-//        }
         Assertions.assertNotNull(products);
-        System.out.println("addProduct " + name + price);
         products.add(new Product(name, price));
     }
 
     public String getProductName(int index) {
-        Assertions.assertNotNull(products, "getProductName, products is null...");
-        return products.get(index).getName();
-    }
-
-    public int getProductPrice(int index) {
         Assertions.assertNotNull(products);
-        return products.get(index).getPrice();
+        return products.get(index).getName();
     }
 
     public int getProductsNum() {
@@ -75,11 +61,8 @@ public class DataManager {
     }
 
     public void quit() {
-        System.out.println("quit DATA_MANAGER");
         DATA_MANAGER = null;
-//        if (products != null) {
-            products = null;
-//        }
+        products = null;
     }
 
 }
