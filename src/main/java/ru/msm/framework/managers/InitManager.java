@@ -26,6 +26,7 @@ public class InitManager {
         DRIVER_MANAGER.quitDriver();
         PROPERTIES_MANAGER.quit();
         PageManager.getINSTANCE().quit();
+        DataManager.getINSTANCE().quit();
     }
 
 }
