@@ -20,7 +20,7 @@ public class Hooks {
     public void before() {
         InitManager.initFramework();
     }
-
+//, value = "Список товаров и самый дорогой товар из списка."
     @After(order = 500)
     public void createProductsInfo() {
         Allure.getLifecycle().addAttachment("ProductsInfo", "text/plain", "txt", getProductsInfo());

@@ -185,7 +185,6 @@ public class ResultPage extends BasePage {
                 "Нужный фильтр не проставлен!");
     }
 
-
     public void addToOrder(int n, String mode) {
         if (mode.contains("не")) {
             addToOrder(n, oddBlueButtons, oddProductNames, oddProductPrices, 1, 0);
@@ -204,40 +203,48 @@ public class ResultPage extends BasePage {
         }
         for (int i = 0; i < k; i++) {
             int preClickButtonsNum = buttons.size();
-            try {   //ввести кол-во попыток?
-                scrollToElementJs(buttons.get(i + t));
-                action.sendKeys(Keys.chord(Keys.ARROW_UP, Keys.ARROW_UP, Keys.ARROW_UP)).perform();
-                waitUntilElementToBeClickable(buttons.get(i + t)).click();
-                wait.until(ExpectedConditions.attributeToBe(cartCounter, "outerText", String.valueOf(preCartCounter + i + 1)));
-                DATA_MANAGER.addProduct(productNames.get(i).getText(), Integer.parseInt(formatD(productPrices.get(i).getText())));
-                t++;
-            } catch (StaleElementReferenceException | ElementClickInterceptedException exception) { //неудавшийся click ?
-                System.out.println(exception.getMessage());
-                int bS;
-                try {   //нужна проверка, точно ли клик не прошел
-                    wait.until(ExpectedConditions.attributeToBe(cartCounter, "outerText", String.valueOf(preCartCounter + i + 1)));
-                    DATA_MANAGER.addProduct(productNames.get(i).getText(), Integer.parseInt(formatD(productPrices.get(i).getText())));
-                    t++;
-                    bS = preClickButtonsNum + 1;
-                } catch (TimeoutException e) {  //клик всё-таки не прошел
-                    i--;
-                    bS = preClickButtonsNum;
-                    DRIVER_MANAGER.getDriver().get(DRIVER_MANAGER.getDriver().getCurrentUrl());
-                }
-                wait.until(buttonsSizeToBe(buttons, bS));
-            } catch (TimeoutException ex) {    //не дождались смены кол-ва товаров - надо проверить, прошел ли click
-                System.out.println(ex.getMessage());
-                int bS;
-                try { // if (buttons.size() == preClickButtonsNum + 1), тогда клик произошел
-                    bS = preClickButtonsNum + 1;
-                    wait.until(buttonsSizeToBe(buttons, bS));
-                    DATA_MANAGER.addProduct(productNames.get(i).getText(), Integer.parseInt(formatD(productPrices.get(i).getText())));
-                    t++;
-                } catch (TimeoutException exc) {   // клик всё-таки не произошел
-                    i--;
-                    bS = preClickButtonsNum;
-                    DRIVER_MANAGER.getDriver().get(DRIVER_MANAGER.getDriver().getCurrentUrl());
-                    wait.until(buttonsSizeToBe(buttons, bS));
+            int bS = preClickButtonsNum + 1;
+            int attempts = 3;
+            while (attempts > 0) {
+                try {
+                    scrollToElementJs(buttons.get(i + t));
+                    action.sendKeys(Keys.chord(Keys.ARROW_UP, Keys.ARROW_UP, Keys.ARROW_UP)).perform();
+                    waitUntilElementToBeClickable(buttons.get(i + t)).click();
+                } catch (StaleElementReferenceException | ElementClickInterceptedException exception) { //неудавшийся click ?
+                    System.out.println(exception.getMessage());
+                    try {   //нужна проверка, точно ли клик не прошел
+                        wait.until(ExpectedConditions.attributeToBe(cartCounter, "outerText",
+                                String.valueOf(preCartCounter + i + 1)));
+                        wait.until(buttonsSizeToBe(buttons, bS));
+                        DATA_MANAGER.addProduct(productNames.get(i).getText(),
+                                Integer.parseInt(formatD(productPrices.get(i).getText())));
+                        t++;
+                        attempts = 0;
+                    } catch (TimeoutException e) {  //клик всё-таки не прошел
+                        bS = preClickButtonsNum;
+                        i--;
+                        attempts--;
+                        int att = 4;
+                        if(buttons.size() == bS){
+                            att = -1;
+                        }
+                        while (att > 0) {
+                            try {
+                                DRIVER_MANAGER.getDriver().get(DRIVER_MANAGER.getDriver().getCurrentUrl());
+                                wait.until(ExpectedConditions.attributeToBe(cartCounter, "outerText",
+                                        String.valueOf(preCartCounter + i + 1)));
+                                wait.until(buttonsSizeToBe(buttons, bS));
+                                att = -1;
+                            } catch (TimeoutException exc) {
+                                att--;
+                            }
+                        }
+                        if (att == -1) {
+                            attempts = 0;
+                        } else {
+                            Assertions.fail();
+                        }
+                    }
                 }
             }
         }
